@@ -459,6 +459,26 @@ suite('Vulcan', function() {
     });
   });
 
+  suite('Coffeescript', function() {
+    test('compile', function(done) {
+      process({input: 'test/html/coffee.html', output: outputPath}, function(outputs) {
+        var vulcanized = outputs[outputPath];
+        assert(vulcanized);
+        var $ = require('whacko').load(vulcanized);
+        var getText = require('../lib/utils.js').getTextContent;
+        var getAttribute = require('../lib/utils.js').getAttribute;
+        var script = $('script');
+        var xa = $('polymer-element[name="x-a"] > script');
+        var xb = $('polymer-element[name="x-b"] > script');
+        assert.equal(getAttribute(script, "type"), "text/javascript");
+        assert(getText(script).match(/x\s*=\s*function\(\)\s*{};/), "coffeescript compiled");
+        assert(getText(xa).match(/Polymer\("x-a",\s*{\s*a: 1\s*}\);/), "Polymer element with name");
+        assert(getText(xb).match(/Polymer\(["']x-b["'],\s*{\s*b: 2\s*}\);/), "Polymer element without name");
+        done();
+      });
+    });
+  });
+
   suite('Strip', function() {
 
     test('uglify', function(done) {
